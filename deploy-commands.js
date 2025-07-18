@@ -12,7 +12,6 @@ for (const file of commandFiles) {
     commands.push(command.data.toJSON());
 }
 
-// Add commands that don't have their own files
 commands.push({ name: 'ping', description: 'Checks if Floofy is responsive.' });
 commands.push({ name: 'help', description: 'Shows the list of all available commands.' });
 commands.push({ name: 'forgetme', description: 'Makes Floofy delete your preferred name from his memory.' });
@@ -33,10 +32,8 @@ commands.push( new SlashCommandBuilder().setName('leveladmin').setDescription('A
 commands.push({ name: 'leaderboard', description: 'Shows the server\'s top 10 users by level.' });
 commands.push({ name: 'privacy', description: 'Provides a link to the bot\'s privacy policy.' });
 commands.push({ name: 'tos', description: 'Provides a link to the bot\'s terms of service.' });
-// --- ADDED NEW COMMANDS ---
 commands.push(new SlashCommandBuilder().setName('announce').setDescription('Admin: Sends an announcement to a specific channel.').addChannelOption(opt => opt.setName('channel').setDescription('The channel to send the message to').setRequired(true)).addStringOption(opt => opt.setName('message').setDescription('The message to send').setRequired(true)).toJSON());
 commands.push(new SlashCommandBuilder().setName('purge').setDescription('Admin: Deletes a specified number of recent messages.').addIntegerOption(opt => opt.setName('amount').setDescription('The number of messages to delete (1-100)').setRequired(true).setMinValue(1).setMaxValue(100)).toJSON());
-
 
 const rest = new REST({ version: '10' }).setToken(config.discordToken);
 

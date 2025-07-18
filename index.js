@@ -29,23 +29,6 @@ const xpCooldowns = new Map();
 const commandCooldowns = new Collection();
 let activeQuests = new Map();
 
-// --- Load Slash Commands from /commands folder ---
-client.commands = new Collection();
-const commandsPath = path.join(__dirname, 'commands');
-if (fs.existsSync(commandsPath)) {
-    const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-    for (const file of commandFiles) {
-        const filePath = path.join(commandsPath, file);
-        const command = require(filePath);
-        if ('data' in command && 'execute' in command) {
-            client.commands.set(command.data.name, command);
-        } else {
-            console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-        }
-    }
-}
-
-
 // ===================================================================================
 //  API HELPER FUNCTIONS
 // ===================================================================================
@@ -79,20 +62,7 @@ async function callGeminiVisionAPI(prompt, base64Image, mimeType) {
     }
 }
 
-async function callImageGenerationAPI(prompt) {
-    const API_URL = `https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image`;
-    try {
-        const response = await axios.post(API_URL, 
-            { text_prompts: [{ text: prompt }], cfg_scale: 7, height: 1024, width: 1024, steps: 30, samples: 1, },
-            { headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': `Bearer ${config.imageApiKey}` }, timeout: 45000 }
-        );
-        return response.data.artifacts[0].base64;
-    } catch (error) {
-        console.error("Full Stability AI Error:", error);
-        throw error;
-    }
-}
-
+// NOTE: The callImageGenerationAPI function has been removed as requested.
 
 // ===================================================================================
 //  AI STATUS UPDATER
@@ -240,39 +210,169 @@ client.on('interactionCreate', async interaction => {
 
     if (!interaction.isChatInputCommand()) return;
     
-    const commandFromFile = client.commands.get(interaction.commandName);
-    if (commandFromFile) {
-        try {
-            await commandFromFile.execute(interaction, db, client);
-        } catch (error) {
-            console.error(error);
-            if (interaction.replied || interaction.deferred) {
-                await interaction.followUp({ content: 'There was an error while executing this command!', flags: [MessageFlags.Ephemeral] });
-            } else {
-                await interaction.reply({ content: 'There was an error while executing this command!', flags: [MessageFlags.Ephemeral] });
-            }
-        }
-        return;
-    }
-    
     const { commandName, options } = interaction;
     const isAdmin = interaction.member.roles.cache.some(role => role.name === 'Admin');
     const guildId = interaction.guild.id;
 
-    if (commandName === 'setupmusic') {
-        if (!isAdmin) return interaction.reply({ content: 'Only Admins can set up the music channel!', flags: [MessageFlags.Ephemeral] });
-        db.setMusicChannelId(guildId, interaction.channel.id);
-        await db.save();
-        await interaction.reply({ content: `This channel has been set as the Music Control Channel!`, ephemeral: true });
-        musicPlayer.initUi(interaction.guild);
+    if (commandName === 'ping') { await interaction.reply('Yip!'); }
+    else if (commandName === 'help') {
+        const helpEmbed = new EmbedBuilder()
+            .setColor(0xFF8C00)
+            .setTitle('Floofy\'s Commands! *awoo!*')
+            .addFields(
+                { name: '`/ping`', value: 'Checks if I\'m online.' },
+                { name: '`/mynameis [name]`', value: 'Lets me know your preferred name.' },
+                { name: '`/forgetme`', value: 'Makes me delete your preferred name.' },
+                { name: '`/timein [location]`', value: 'Tells you the current time in a city.' },
+                { name: '`/summarize`', value: 'I\'ll read our chat and give you a summary!' },
+                { name: '`/level [@user]`', value: 'Check your rank, or see another user\'s rank.'},
+                { name: '`/leaderboard`', value: 'Shows the server\'s top 10 users by level.' },
+                { name: '`/privacy`', value: 'Provides a link to my privacy policy.' },
+                { name: '`/tos`', value: 'Provides a link to my terms of service.' },
+                { name: '`Right-Click Message > Apps > whatisthis`', value: 'I\'ll describe the image in the message you click on.' },
+                { name: '`React with 📌`', value: 'React to any message with a pin emoji to save it to your log channel.' },
+                { name: '`/help`', value: 'Shows this menu.' },
+                { name: 'Admin Commands', value: '---' },
+                { name: '`/announce [channel] [message]`', value: '**Admin:** Sends an announcement as me to a specific channel.' },
+                { name: '`/purge [amount]`', value: '**Admin:** Deletes up to 100 recent messages in a channel.' },
+                { name: '`/chatchannel [action]`', value: '**Admin:** Manages which channels I can chat in.' },
+                { name: '`/listenchannel [action]`', value: '**Admin:** Manages channels where I silently learn facts about users.' },
+                { name: '`/clearhistory`', value: '**Admin:** Clears my memory for this channel.' },
+                { name: '`/viewprofile [@user]`', value: '**Admin:** Shows what I know about a user (sends a DM).' },
+                { name: '`/addnote [@user] [note]`', value: '**Admin:** Adds a private note to a user\'s profile.' },
+                { name: '`/leveladmin [set|add|remove] [@user] [amount]`', value: '**Admin:** Manages user levels and XP.'},
+                { name: '`/setwelcome [message]`', value: '**Admin:** Sets the server welcome message. Use `{user}` to mention the new member.' },
+                { name: '`/setwelcomechannel [channel]`', value: '**Admin:** Sets the channel where I post welcome messages.' },
+                { name: '`/setlogchannel [channel]`', value: '**Admin:** Sets the channel where I log pinned messages.' }
+            );
+        await interaction.reply({ embeds: [helpEmbed] });
     }
-    else if (commandName === 'play') { await musicPlayer.play(interaction); }
-    else if (commandName === 'skip') { await musicPlayer.skip(interaction); }
-    else if (commandName === 'stop') { await musicPlayer.stop(interaction); }
-    else if (commandName === 'pause') { await musicPlayer.pauseOrResume(interaction); }
-    else if (commandName === 'resume') { await musicPlayer.pauseOrResume(interaction); }
-    else if (commandName === 'queue') { await musicPlayer.getQueueInfo(interaction); }
-    else if (commandName === 'disconnect') { await musicPlayer.disconnect(interaction); }
+    else if (commandName === 'mynameis') {
+        const name = options.getString('name');
+        db.setPreferredName(interaction.user.id, name);
+        await db.save();
+        await interaction.reply({ content: `Okay, I'll remember that your name is **${name}**! *wags tail excitedly*`, flags: [MessageFlags.Ephemeral] });
+    }
+    else if (commandName === 'forgetme') {
+        const success = db.deleteProfile(interaction.user.id);
+        if (success) { await db.save(); await interaction.reply({ content: 'O-okay... I\'ve forgotten your preferred name.', flags: [MessageFlags.Ephemeral] }); } 
+        else { await interaction.reply({ content: 'I don\'t seem to have a profile for you to forget!', flags: [MessageFlags.Ephemeral] }); }
+    }
+    else if (commandName === 'chatchannel') {
+        if (!isAdmin) return interaction.reply({ content: "Awoo! Sorry, only Admins can manage my chat channels!", flags: [MessageFlags.Ephemeral] });
+        const subCommand = options.getString('action');
+        const channelId = interaction.channel.id;
+        if (subCommand === 'add') {
+            if (db.addChatChannel(guildId, channelId)) { await db.save(); await interaction.reply(`Okay! I will now start chatting in <#${channelId}>.`); } 
+            else { await interaction.reply(`I'm already allowed to chat in this channel!`); }
+        } else if (subCommand === 'remove') {
+            if (db.removeChatChannel(guildId, channelId)) { await db.save(); await interaction.reply(`Okay, I will no longer chat in <#${channelId}>.`); } 
+            else { await interaction.reply(`I wasn't enabled for this channel anyway.`); }
+        } else if (subCommand === 'list') {
+            const enabledChannels = db.listChatChannels(guildId);
+            if (enabledChannels.length === 0) return interaction.reply("I'm not enabled to chat in any channels right now.");
+            const channelList = enabledChannels.map(id => `- <#${id}>`).join('\n');
+            const listEmbed = new EmbedBuilder().setColor(0x0099FF).setTitle('Active AI Chat Channels').setDescription(channelList);
+            await interaction.reply({ embeds: [listEmbed] });
+        }
+    }
+    else if (commandName === 'listenchannel') {
+        if (!isAdmin) return interaction.reply({ content: "Awoo! Sorry, only Admins can change my listening channels!", flags: [MessageFlags.Ephemeral] });
+        const subCommand = options.getString('action');
+        const channelId = interaction.channel.id;
+        if (subCommand === 'add') {
+            if (db.addListenChannel(guildId, channelId)) { await db.save(); await interaction.reply(`Okay! I will now start silently listening for facts in <#${channelId}>.`); } 
+            else { await interaction.reply(`I'm already listening in this channel!`); }
+        } else if (subCommand === 'remove') {
+            if (db.removeListenChannel(guildId, channelId)) { await db.save(); await interaction.reply(`Okay, I will no longer listen for facts in <#${channelId}>.`); } 
+            else { await interaction.reply(`I wasn't listening in this channel anyway.`); }
+        } else if (subCommand === 'list') {
+            const listenChannels = db.listListenChannels(guildId);
+            if (listenChannels.length === 0) return interaction.reply("I'm not listening for facts in any channels right now.");
+            const channelList = listenChannels.map(id => `- <#${id}>`).join('\n');
+            const listEmbed = new EmbedBuilder().setColor(0x0099FF).setTitle('Fact-Finding Channels').setDescription(channelList);
+            await interaction.reply({ embeds: [listEmbed] });
+        }
+    }
+    else if (commandName === 'clearhistory') {
+        if (!isAdmin) return interaction.reply({ content: 'Only Admins can clear the chat history!', flags: [MessageFlags.Ephemeral] });
+        db.clearHistory(interaction.channel.id);
+        await db.save();
+        await interaction.reply('*poof!* My memory of this channel is all gone!');
+    }
+    else if (commandName === 'summarize') {
+        const history = db.getHistory(interaction.channel.id);
+        if (!history) return interaction.reply("There's no history to summarize yet!");
+        const summaryPrompt = `Please provide a brief, one-paragraph summary of the following conversation:\n\n${history}`;
+        try {
+            await interaction.deferReply();
+            const summary = await callGeminiAPI(summaryPrompt);
+            await interaction.editReply(`**Here's what we talked about, rawr!**\n>>> ${summary}`);
+        } catch (e) { await interaction.editReply("Sorry, I couldn't summarize the chat right now."); console.error("Summarize error:", e); }
+    }
+    else if (commandName === 'viewprofile') {
+        if (!isAdmin) return interaction.reply({ content: "Hehe, only Admins can peek at my notes...", flags: [MessageFlags.Ephemeral] });
+        const user = options.getUser('user');
+        if (!user) return interaction.reply({ content: "You need to specify a user! Usage: `/viewprofile @user`", flags: [MessageFlags.Ephemeral] });
+        const profile = db.getProfile(user.id);
+        if (!profile || !profile.notes || profile.notes.length === 0) {
+            return interaction.reply({ content: `I don't have any learned facts or notes for ${user.username} yet.`, flags: [MessageFlags.Ephemeral] });
+        }
+        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+        const summaryPrompt = `Based on the following list of facts and traits about a person, write a short, one-paragraph personality summary. Do not list the facts, but synthesize them into a coherent description:\n\n${profile.notes.join('\n')}`;
+        try {
+            const summary = await callGeminiAPI(summaryPrompt);
+            const profileInfo = `
+**AI-Generated Summary for ${user.username}**
+>>> ${summary}
+---------------------------------
+**All Stored Notes & Facts:**
+>>> ${(profile.notes && profile.notes.length > 0) ? profile.notes.join('\n') : 'None'}
+            `;
+            await interaction.user.send(profileInfo);
+            await interaction.editReply({ content: "I've sent the enhanced profile summary to your DMs! *yip*" });
+        } catch (e) {
+            console.error("Failed to send profile DM or get summary:", e);
+            await interaction.editReply({ content: "I couldn't get the AI summary or send you a DM. Please check your privacy settings and the bot's console for errors." });
+        }
+    }
+    else if (commandName === 'addnote') {
+        if (!isAdmin) return interaction.reply({ content: 'Only Admins can add notes!', flags: [MessageFlags.Ephemeral] });
+        const user = options.getUser('user');
+        const note = options.getString('note');
+        db.addNoteToProfile(user.id, note);
+        await db.save();
+        await interaction.reply({ content: `Okay, I've added that note to my memory for ${user.username}.`, flags: [MessageFlags.Ephemeral] });
+    }
+    else if (commandName === 'setwelcome') {
+        if (!isAdmin) return interaction.reply({ content: 'Only Admins can set the welcome message!', flags: [MessageFlags.Ephemeral] });
+        const welcomeMsg = options.getString('message');
+        db.setWelcomeMessage(guildId, welcomeMsg);
+        await db.save();
+        await interaction.reply({ content: `The new welcome message has been set!`, flags: [MessageFlags.Ephemeral] });
+    }
+    else if (commandName === 'setwelcomechannel') {
+        if (!isAdmin) return interaction.reply({ content: 'Only Admins can set the welcome channel!', flags: [MessageFlags.Ephemeral] });
+        const channel = options.getChannel('channel');
+        db.setWelcomeChannelId(guildId, channel.id);
+        await db.save();
+        await interaction.reply(`Okay! New members will now be welcomed in ${channel.toString()}.`);
+    }
+    else if (commandName === 'setlogchannel') {
+        if (!isAdmin) return interaction.reply({ content: 'Only Admins can set the log channel!', flags: [MessageFlags.Ephemeral] });
+        const channel = options.getChannel('channel');
+        db.setLogChannelId(guildId, channel.id);
+        await db.save();
+        await interaction.reply(`Okay! Pinned messages will now be logged in ${channel.toString()}.`);
+    }
+    else if (commandName === 'timein') {
+        const tz = options.getString('location');
+        try {
+            const time = new Date();
+            const zonedTime = format(zonedTimeToUtc(time, tz), 'yyyy-MM-dd hh:mm:ss a (zzz)', { timeZone: tz });
+            await interaction.reply(`The current time in ${tz} is: **${zonedTime}**`);
+        } catch (e) { await interaction.reply({ content: "I couldn't find that timezone. Please use a valid IANA timezone name (e.g., 'Europe/London' or 'America/New_York').", flags: [MessageFlags.Ephemeral] }); }
+    }
     else if (commandName === 'level') {
         const user = options.getUser('user') || interaction.user;
         if (options.getUser('user') && !isAdmin) {
@@ -309,37 +409,73 @@ client.on('interactionCreate', async interaction => {
         }
         await db.save();
     }
-    else if (commandName === 'setwelcomechannel') {
-        if (!isAdmin) return interaction.reply({ content: 'Only Admins can set the welcome channel!', flags: [MessageFlags.Ephemeral] });
-        const channel = options.getChannel('channel');
-        db.setWelcomeChannelId(guildId, channel.id);
-        await db.save();
-        await interaction.reply(`Okay! New members will now be welcomed in ${channel.toString()}.`);
+    else if (commandName === 'leaderboard') {
+        const allProfiles = db.getAllProfiles();
+        const sortedProfiles = Object.entries(allProfiles)
+            .filter(([, profile]) => profile.xp > 0)
+            .sort(([, a], [, b]) => b.xp - a.xp)
+            .slice(0, 10);
+        if (sortedProfiles.length === 0) {
+            return interaction.reply("There's no one on the leaderboard yet!");
+        }
+        let description = '';
+        for (let i = 0; i < sortedProfiles.length; i++) {
+            const [userId, profile] = sortedProfiles[i];
+            const rank = i + 1;
+            const userName = profile.preferredName || `<@${userId}>`;
+            description += `**${rank}.** ${userName} - **Level ${profile.level}** (${profile.xp} XP)\n`;
+        }
+        const leaderboardEmbed = new EmbedBuilder()
+            .setColor(0xFFD700)
+            .setTitle('Server Leaderboard - Top 10')
+            .setDescription(description)
+            .setTimestamp();
+        await interaction.reply({ embeds: [leaderboardEmbed] });
     }
-    else if (commandName === 'setlogchannel') {
-        if (!isAdmin) return interaction.reply({ content: 'Only Admins can set the log channel!', flags: [MessageFlags.Ephemeral] });
-        const channel = options.getChannel('channel');
-        db.setLogChannelId(guildId, channel.id);
-        await db.save();
-        await interaction.reply(`Okay! Pinned messages will now be logged in ${channel.toString()}.`);
+    else if (commandName === 'privacy') {
+        if (!config.privacyPolicyUrl) return interaction.reply({ content: "The bot owner has not set a privacy policy URL yet.", ephemeral: true });
+        await interaction.reply(`You can view my privacy policy here: ${config.privacyPolicyUrl}`);
     }
-     else if (commandName === 'setquestchannel') {
-        if (!isAdmin) return interaction.reply({ content: 'Only Admins can set the quest channel!', flags: [MessageFlags.Ephemeral] });
-        const channel = options.getChannel('channel');
-        db.setQuestChannelId(guildId, channel.id);
-        await db.save();
-        await interaction.reply(`Okay! AI Quests will now be posted in ${channel.toString()}.`);
+    else if (commandName === 'tos') {
+        if (!config.termsOfServiceUrl) return interaction.reply({ content: "The bot owner has not set a terms of service URL yet.", ephemeral: true });
+        await interaction.reply(`You can view my terms of service here: ${config.termsOfServiceUrl}`);
     }
-    else if (commandName === 'setcurrencyname') {
-        if (!isAdmin) return interaction.reply({ content: 'Only Admins can set the currency name!', flags: [MessageFlags.Ephemeral] });
-        const name = options.getString('name');
-        db.setCurrencyName(guildId, name);
-        await db.save();
-        await interaction.reply(`Okay! The server currency is now called **${name}**.`);
+    else if (commandName === 'announce') {
+        if (!isAdmin) return interaction.reply({ content: 'Only Admins can send announcements!', flags: [MessageFlags.Ephemeral] });
+        const channel = options.getChannel('channel');
+        const message = options.getString('message');
+        if (channel.type !== ChannelType.GuildText) {
+            return interaction.reply({ content: 'You can only send announcements to text channels!', flags: [MessageFlags.Ephemeral] });
+        }
+        const announceEmbed = new EmbedBuilder()
+            .setColor(0xFF4500)
+            .setTitle('📢 Server Announcement')
+            .setDescription(message)
+            .setTimestamp()
+            .setFooter({ text: `Sent by ${interaction.user.username}` });
+        try {
+            await channel.send({ embeds: [announceEmbed] });
+            await interaction.reply({ content: `Announcement successfully sent to ${channel.toString()}.`, flags: [MessageFlags.Ephemeral] });
+        } catch (e) {
+            console.error("Announce error:", e);
+            await interaction.reply({ content: `I couldn't send a message to that channel. Please check my permissions!`, flags: [MessageFlags.Ephemeral] });
+        }
+    }
+    else if (commandName === 'purge') {
+        if (!isAdmin) return interaction.reply({ content: 'Only Admins can purge messages!', flags: [MessageFlags.Ephemeral] });
+        const amount = options.getInteger('amount');
+        try {
+            const deletedMessages = await interaction.channel.bulkDelete(amount, true);
+            await interaction.reply({ content: `Successfully deleted ${deletedMessages.size} messages.`, flags: [MessageFlags.Ephemeral] });
+        } catch (e) {
+            console.error("Purge error:", e);
+            await interaction.reply({ content: `I couldn't delete the messages. This might be because they are older than 14 days, or I'm missing the 'Manage Messages' permission.`, flags: [MessageFlags.Ephemeral] });
+        }
     }
 });
 
 
+// --- AI Chat Message Handler ---
 client.on('messageCreate', async message => {
     if (message.author.bot || message.content.startsWith('/') || !message.guild) {
         if (message.author.bot) return;
@@ -355,20 +491,6 @@ client.on('messageCreate', async message => {
     const guildId = message.guild.id;
     const channelId = message.channel.id;
     let changesMade = false;
-
-    const musicChannelId = db.getMusicChannelId(guildId);
-    if (channelId === musicChannelId && play.validate(message.content)) {
-        const fakeInteraction = {
-            guild: message.guild, member: message.member, channel: message.channel, user: message.author,
-            options: { getString: () => message.content },
-            reply: async (msg) => { const sent = await message.channel.send(msg); setTimeout(() => sent.delete().catch(()=>{}), 10000); },
-            deferReply: async () => {}, 
-            editReply: async (msg) => { const sent = await message.channel.send(msg); setTimeout(() => sent.delete().catch(()=>{}), 10000); }
-        };
-        await musicPlayer.play(fakeInteraction);
-        try { await message.delete(); } catch(e) { console.error("Could not delete song link message:", e); }
-        return;
-    }
     
     try {
         if (db.isChannelEnabled(guildId, channelId) || db.isListenChannel(guildId, channelId)) {
@@ -432,7 +554,6 @@ client.on('messageCreate', async message => {
         await db.save();
     }
 });
-
 
 // --- Login ---
 client.login(config.discordToken);

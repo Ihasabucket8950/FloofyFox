@@ -1,7 +1,6 @@
 {
   "discordToken": "YOUR_DISCORD_BOT_TOKEN_HERE",
   "geminiApiKey": "YOUR_GEMINI_API_KEY_HERE",
-  "imageApiKey": "YOUR_STABILITY_AI_API_KEY_HERE",
   "clientId": "YOUR_BOT_APPLICATION_ID_HERE",
   "privacyPolicyUrl": "https://github.com/Ihasabucket8950/FloofyFox/blob/974a5036fecde039bb5457d127f9da5672ee7268/Privacy%20Policy.txt",
   "termsOfServiceUrl": "https://github.com/Ihasabucket8950/FloofyFox/blob/4fd32d93e0156dca7ffadaed3b4ef95ecab76f8c/Terms%20of%20Service.txt"
