@@ -147,13 +147,13 @@ const Database = {
     removeListenChannel(guildId, channelId) { this._ensureGuildSettings(guildId); const i = settings[guildId].listeningChannels.indexOf(channelId); if (i > -1) { settings[guildId].listeningChannels.splice(i, 1); return true; } return false; },
     listListenChannels(guildId) { this._ensureGuildSettings(guildId); return settings[guildId].listeningChannels; },
 
-    getWelcomeMessage: (guildId) => { this._ensureGuildSettings(guildId); return settings[guildId].welcomeMessage; },
+    getWelcomeMessage(guildId) { this._ensureGuildSettings(guildId); return settings[guildId].welcomeMessage; },
     setWelcomeMessage(guildId, message) { this._ensureGuildSettings(guildId); settings[guildId].welcomeMessage = message; },
 
-    getWelcomeChannelId: (guildId) => { this._ensureGuildSettings(guildId); return settings[guildId].welcomeChannelId; },
+    getWelcomeChannelId(guildId) { this._ensureGuildSettings(guildId); return settings[guildId].welcomeChannelId; },
     setWelcomeChannelId(guildId, channelId) { this._ensureGuildSettings(guildId); settings[guildId].welcomeChannelId = channelId; },
 
-    getLogChannelId: (guildId) => { this._ensureGuildSettings(guildId); return settings[guildId].logChannelId; },
+    getLogChannelId(guildId) { this._ensureGuildSettings(guildId); return settings[guildId].logChannelId; },
     setLogChannelId(guildId, channelId) { this._ensureGuildSettings(guildId); settings[guildId].logChannelId = channelId; },
 
     getQuestChannelId(guildId) { this._ensureGuildSettings(guildId); return settings[guildId].questChannelId; },

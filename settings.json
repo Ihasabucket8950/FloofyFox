@@ -1,0 +1,43 @@
+{
+  "1200284479034495108": {
+    "enabledChannels": [
+      "1200284480720621580"
+    ],
+    "listeningChannels": [
+      "1200284480720621580",
+      "1395593824138559530"
+    ],
+    "welcomeChannelId": "1395914861195559113",
+    "logChannelId": "1395916412282994810",
+    "questChannelId": null,
+    "musicChannelId": null,
+    "musicUiMessageId": null,
+    "welcomeMessage": "Welcome, {user}!",
+    "currencyName": "Sparkles",
+    "customCommands": {}
+  },
+  "1337532070146347089": {
+    "enabledChannels": [],
+    "listeningChannels": [],
+    "welcomeChannelId": null,
+    "logChannelId": null,
+    "questChannelId": null,
+    "musicChannelId": null,
+    "musicUiMessageId": null,
+    "welcomeMessage": "Welcome, {user}!",
+    "currencyName": "Sparkles",
+    "customCommands": {}
+  },
+  "1356434138063966248": {
+    "enabledChannels": [],
+    "listeningChannels": [],
+    "welcomeChannelId": null,
+    "logChannelId": null,
+    "questChannelId": null,
+    "musicChannelId": null,
+    "musicUiMessageId": null,
+    "welcomeMessage": "Welcome, {user}!",
+    "currencyName": "Sparkles",
+    "customCommands": {}
+  }
+}
