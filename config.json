@@ -1,8 +1,6 @@
 {
-  "discordToken": "MTM5MTY3NjgxNTg0MzY1NTcyMA.GxKgH1.j9edWiG3KD1JnTbcaF-FLD_z3dDqfgQk0dV_P0",
+  "discordToken": "MTM5MTY3NjgxNTg0MzY1NTcyMA.GxKgH1.j9edWiG3KD1JnTbcaF-FLD_z3dDqfgQk0dV_P0", 
   "geminiApiKey": "AIzaSyDaGLb383JXrxisTE_IWx8JJ6wH4QK3zlc",
   "imageApiKey": "sk-l1bpfCoG1EGNZygkHXvbtT3w9QQAF5q2IroDToOEHwMjVt0O",
   "clientId": "1391676815843655720",
-  "guildId": "1200284479034495108",
-  "botOwnerId": "935208006214373467"
 }
