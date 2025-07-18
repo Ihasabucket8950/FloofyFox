@@ -1,8 +1,4 @@
 {
-  "discordToken": "YOUR_DISCORD_BOT_TOKEN_HERE",
-  "geminiApiKey": "YOUR_GEMINI_API_KEY_HERE",
-  "imageApiKey": "YOUR_STABILITY_AI_API_KEY_HERE",
-  "clientId": "YOUR_BOT_APPLICATION_ID_HERE",
   "guildId": "YOUR_SERVER_ID_HERE",
   "welcomeChannelId": "YOUR_WELCOME_CHANNEL_ID_HERE",
   "logChannelId": "YOUR_MESSAGE_LOG_CHANNEL_ID_HERE",
@@ -10,3 +6,6 @@
   "termsOfServiceUrl": "https://yourwebsite.com/tos"
 }
 
+  "privacyPolicyUrl": "",
+  "termsOfServiceUrl": ""
+}

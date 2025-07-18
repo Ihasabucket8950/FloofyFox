@@ -1,0 +1,75 @@
+Privacy Policy for Floofy Fox Discord Bot
+Last Updated: July 18, 2025
+
+This Privacy Policy outlines how the Floofy Fox Discord Bot ("the Bot") collects, uses, and stores your data. By using the Bot, you consent to the data practices described in this policy.
+
+1. Information We Collect
+To provide its features, the Bot collects and stores specific types of data:
+
+User-Provided Information:
+
+Discord User ID: Your unique Discord ID is stored as a key for your user profile.
+
+Preferred Name: If you use the /mynameis command, the name you provide is stored.
+
+Server Activity Data:
+
+Experience Points (XP) and Level: Your message activity is used to calculate and store your XP and level for the server's leaderboard.
+
+Server Currency: Your balance of the server's currency is stored in your profile.
+
+AI-Learned Information (User Notes):
+
+When operating in a "listening channel," the Bot sends your messages to a third-party AI (Google Gemini) to analyze them for personal facts and personality traits (e.g., "The user likes cats," "The user is humorous"). These generated notes are stored in your user profile.
+
+Server administrators can manually add notes to your profile using the /addnote command.
+
+Conversation Data:
+
+To provide conversational memory, the Bot stores the content of messages sent in channels where it is active. This history is stored on a per-channel basis.
+
+Server Configuration Data:
+
+The Bot stores server-specific settings, such as the IDs of designated welcome, log, and music channels, as configured by server administrators.
+
+2. How We Use Your Data
+Your data is used exclusively to power the Bot's features:
+
+Personalization: Your preferred name and learned notes are used to create more personalized and contextual AI chat responses.
+
+Functionality: Conversation history is used to provide memory to the AI. XP and level data are used for the /level and /leaderboard commands.
+
+Server Management: Stored channel IDs are used for features like welcome messages and message logging.
+
+3. Data Storage and Security
+All data collected by the Bot is stored in JSON files on the local machine or server where the Bot is hosted. While reasonable measures are taken to secure this data, no guarantee of absolute security can be made. The owner/developer is not responsible for any data loss or breach.
+
+4. Data Sharing with Third Parties
+We do not sell or share your personal data with third parties, with the following critical exceptions:
+
+AI Service Providers: To function, the Bot sends data to external AI services. This includes:
+
+Google Gemini: Your messages, conversation history, and user profile notes are sent to the Gemini API to generate chat responses, summaries, and learned facts.
+
+Stability AI: Prompts you provide to the /draw command are sent to the Stability AI API to generate images.
+
+By using these AI-powered features, you acknowledge that your data is being processed by these third-party services, and you are subject to their respective privacy policies. The owner/developer of Floofy Fox has no control over and assumes no liability for the data handling practices of these third-party services.
+
+5. User Rights and Data Control
+You have control over your personal data stored by the Bot:
+
+/forgetme: This command will permanently delete your entire user profile, including your preferred name, notes, XP, and level.
+
+/mymemory: This command allows you to view all learned facts and traits stored in your profile and provides a way to delete specific notes.
+
+6. Data Retention
+Data is stored indefinitely to maintain long-term functionality for features like the leveling system. Data is only deleted when a user requests it via the /forgetme command or when a server administrator clears channel history via /clearhistory.
+
+7. Limitation of Liability
+The use of this Bot is at your own risk. The owner/developer shall not be held liable for any data breaches, loss of data, or any damages resulting from the use or misuse of the Bot.
+
+8. Changes to This Policy
+This Privacy Policy may be updated at any time. Continued use of the Bot after changes are posted constitutes your acceptance of the new policy.
+
+9. Contact
+If you have any questions about this Privacy Policy, please contact the bot owner on Discord at ihasabucket8950.
