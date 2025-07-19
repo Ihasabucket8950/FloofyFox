@@ -112,7 +112,7 @@ An empty commands folder in the project root.
 🚀 Setup Guide
 Clone the Repository:
 
-git clone [repository-url]
+git clone https://github.com/Ihasabucket8950/FloofyFox.git
 cd FloofyFox
 
 Install Dependencies:
@@ -123,8 +123,6 @@ npm install
 This will install discord.js, axios, @discordjs/voice, play-dl, ffmpeg-static, and date-fns-tz.
 
 Configure the Bot:
-
-Rename the config.example.json file to config.json.
 
 Open config.json and fill in all the required values: discordToken, geminiApiKey, and clientId.
 
