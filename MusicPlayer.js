@@ -4,12 +4,11 @@ const {
     joinVoiceChannel,
     NoSubscriberBehavior,
     AudioPlayerStatus,
-    VoiceConnectionStatus,
-    entersState
+    VoiceConnectionStatus
 } = require('@discordjs/voice');
 const play = require('play-dl');
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const db = require('./database.js'); // We need the database to find the UI message
+const db = require('./database.js');
 
 class MusicPlayer {
     constructor() {
@@ -20,15 +19,6 @@ class MusicPlayer {
         if (!this.queues.has(guildId)) {
             const player = createAudioPlayer({
                 behaviors: { noSubscriber: NoSubscriberBehavior.Stop },
-            });
-
-            // When the player finishes a song, play the next one
-            player.on(AudioPlayerStatus.Idle, () => {
-                const queue = this.getQueue(guildId);
-                if (!queue.loop) {
-                    queue.songs.shift();
-                }
-                this.playNext(guildId);
             });
 
             const queue = {
@@ -42,6 +32,14 @@ class MusicPlayer {
                 loop: false,
                 uiMessage: null
             };
+
+            player.on(AudioPlayerStatus.Idle, () => {
+                const currentQueue = this.getQueue(guildId);
+                if (!currentQueue.loop) {
+                    currentQueue.songs.shift();
+                }
+                this.playNext(guildId);
+            });
 
             this.queues.set(guildId, queue);
         }
@@ -78,6 +76,12 @@ class MusicPlayer {
         }
 
         const searchResult = await play.search(query, { limit: 1 });
+        
+        // --- THIS IS THE NEW DEBUGGING LINE ---
+        console.log("--- RAW PLAY-DL SEARCH RESULT ---");
+        console.log(JSON.stringify(searchResult, null, 2));
+        console.log("---------------------------------");
+        
         if (searchResult.length === 0) {
             return interaction.editReply(`Sorry, I couldn't find any results for "${query}"`);
         }
@@ -86,24 +90,32 @@ class MusicPlayer {
         const playlist = searchResult[0].playlist;
         if (playlist) {
             const playlistVideos = await playlist.all_videos();
-            songsToAdd = playlistVideos.map(video => ({
-                title: video.title,
-                url: video.url,
-                duration: video.durationRaw,
-                thumbnail: video.thumbnails[0]?.url,
-                user: interaction.user.tag
-            }));
+            songsToAdd = playlistVideos
+                .filter(video => video && video.url)
+                .map(video => ({
+                    title: video.title || 'Unknown Title',
+                    url: video.url,
+                    duration: video.durationRaw,
+                    thumbnail: video.thumbnails[0]?.url,
+                    user: interaction.user.tag
+                }));
         } else {
             const video = searchResult[0];
-            songsToAdd.push({
-                title: video.title,
-                url: video.url,
-                duration: video.durationRaw,
-                thumbnail: video.thumbnails[0]?.url,
-                user: interaction.user.tag
-            });
+            if (video && video.url) {
+                songsToAdd.push({
+                    title: video.title || 'Unknown Title',
+                    url: video.url,
+                    duration: video.durationRaw,
+                    thumbnail: video.thumbnails[0]?.url,
+                    user: interaction.user.tag
+                });
+            }
         }
         
+        if (songsToAdd.length === 0) {
+            return interaction.editReply(`I found results for "${query}", but couldn't queue any valid songs. Please check the console log.`);
+        }
+
         queue.songs.push(...songsToAdd);
         
         const replyMessage = playlist 
@@ -124,7 +136,6 @@ class MusicPlayer {
         if (queue.songs.length === 0) {
             queue.playing = false;
             this.updateUi(guildId);
-            // Set a timer to disconnect after 5 minutes of inactivity
             setTimeout(() => {
                 const currentQueue = this.queues.get(guildId);
                 if (currentQueue && !currentQueue.playing && currentQueue.connection) {
@@ -139,6 +150,16 @@ class MusicPlayer {
         queue.paused = false;
         const song = queue.songs[0];
 
+        if (!song || !song.url) {
+            console.error("Attempted to play a song with no URL:", song);
+            if (queue.textChannel) {
+                queue.textChannel.send(`Skipping a broken or invalid track.`);
+            }
+            queue.songs.shift();
+            this.playNext(guildId);
+            return;
+        }
+
         try {
             const stream = await play.stream(song.url);
             const resource = createAudioResource(stream.stream, { inputType: stream.type });
@@ -146,7 +167,9 @@ class MusicPlayer {
             this.updateUi(guildId);
         } catch (error) {
             console.error("Error playing song:", error);
-            queue.textChannel.send(`Error playing **${song.title}**. Skipping...`);
+            if (queue.textChannel) {
+                queue.textChannel.send(`Error playing **${song.title}**. Skipping...`);
+            }
             queue.songs.shift();
             this.playNext(guildId);
         }
@@ -171,7 +194,7 @@ class MusicPlayer {
     skip(interaction) {
         const queue = this.getQueue(interaction.guild.id);
         if (queue.songs.length === 0) return interaction.reply({ content: 'There are no songs to skip!', ephemeral: true });
-        queue.player.stop(); // This triggers the 'idle' event, which plays the next song
+        queue.player.stop();
         interaction.reply({ content: '⏭️ Skipped!', ephemeral: true });
     }
 
@@ -180,7 +203,6 @@ class MusicPlayer {
         if (!queue.connection) return interaction.reply({ content: 'I\'m not in a voice channel!', ephemeral: true });
         queue.songs = [];
         queue.player.stop();
-        // Disconnecting is handled by the voiceStateUpdate event
         interaction.reply({ content: '⏹️ Stopped the music and cleared the queue!', ephemeral: true });
     }
 
@@ -193,9 +215,18 @@ class MusicPlayer {
         this.queues.delete(interaction.guild.id);
         interaction.reply({ content: '👋 Disconnected!', ephemeral: true });
     }
-    
-    // --- Persistent UI Methods ---
 
+    getQueueInfo(interaction) {
+        const queue = this.getQueue(interaction.guild.id);
+        if (queue.songs.length === 0) return interaction.reply({ content: 'The queue is currently empty!', ephemeral: true });
+        const queueString = queue.songs.map((song, index) => `${index + 1}. **${song.title}**`).slice(0, 10).join('\n');
+        const embed = new EmbedBuilder()
+            .setColor(0xADD8E6)
+            .setTitle('Current Music Queue')
+            .setDescription(queueString);
+        return interaction.reply({ embeds: [embed], ephemeral: true });
+    }
+    
     createUiEmbed(queue) {
         const song = queue?.songs[0];
         const embed = new EmbedBuilder();
@@ -209,7 +240,7 @@ class MusicPlayer {
         if (!queue || !song) {
             embed.setTitle('No song playing')
                  .setDescription('Use `/play` or paste a link in this channel to start!')
-                 .setImage('https://media.tenor.com/D-s_hJ_l-9EAAAAC/fox-femboy.gif'); // A default image
+                 .setImage('https://media.tenor.com/D-s_hJ_l-9EAAAAC/fox-femboy.gif');
             return { embeds: [embed], components: [row] };
         }
 
@@ -232,7 +263,6 @@ class MusicPlayer {
         const channel = guild.channels.cache.get(musicChannelId);
         if (!channel) return;
 
-        // Delete old messages from the bot
         const messages = await channel.messages.fetch({ limit: 10 });
         messages.filter(msg => msg.author.id === guild.client.user.id).forEach(msg => msg.delete().catch(() => {}));
         
@@ -253,8 +283,7 @@ class MusicPlayer {
             const uiPayload = this.createUiEmbed(queue);
             await queue.uiMessage.edit(uiPayload);
         } catch (error) {
-            // This can happen if the message was deleted. Re-initialize.
-            if (error.code === 10008) { // Unknown Message
+            if (error.code === 10008) {
                 console.log(`UI message for guild ${guildId} not found, re-initializing.`);
                 this.initUi(queue.uiMessage.guild);
             } else {
