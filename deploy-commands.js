@@ -42,18 +42,21 @@ const commands = [
         .addStringOption(opt => opt.setName('message').setDescription('The message to send').setRequired(true)),
     new SlashCommandBuilder().setName('purge').setDescription('Admin: Deletes a specified number of recent messages.')
         .addIntegerOption(opt => opt.setName('amount').setDescription('The number of messages to delete (1-100)').setRequired(true).setMinValue(1).setMaxValue(100)),
-    // --- ADDED NEW COMMAND ---
     new SlashCommandBuilder().setName('mymemory').setDescription('Manage the facts Floofy has learned about you.')
-        .addSubcommand(sub => sub
-            .setName('view')
-            .setDescription('View the facts and traits Floofy has learned about you.'))
-        .addSubcommand(sub => sub
-            .setName('forget')
-            .setDescription('Tell Floofy to forget a specific fact about you.')
-            .addIntegerOption(option => option
-                .setName('number')
-                .setDescription('The number of the fact to forget, from the view list.')
-                .setRequired(true))),
+        .addSubcommand(sub => sub.setName('view').setDescription('View the facts and traits Floofy has learned about you.'))
+        .addSubcommand(sub => sub.setName('forget').setDescription('Tell Floofy to forget a specific fact about you.').addIntegerOption(option => option.setName('number').setDescription('The number of the fact to forget, from the view list.').setRequired(true))),
+    
+    // --- MUSIC COMMANDS ---
+    new SlashCommandBuilder().setName('setupmusic').setDescription('Admin: Sets up the music control channel for this server.'),
+    new SlashCommandBuilder().setName('play').setDescription('Plays a song or playlist from YouTube or Spotify.')
+        .addStringOption(option => option.setName('query').setDescription('A song name or URL').setRequired(true)),
+    new SlashCommandBuilder().setName('skip').setDescription('Skips the current song.'),
+    new SlashCommandBuilder().setName('stop').setDescription('Stops the music and clears the queue.'),
+    new SlashCommandBuilder().setName('pause').setDescription('Pauses the current song.'),
+    new SlashCommandBuilder().setName('resume').setDescription('Resumes the paused song.'),
+    new SlashCommandBuilder().setName('queue').setDescription('Shows the current music queue.'),
+    new SlashCommandBuilder().setName('disconnect').setDescription('Disconnects the bot from the voice channel.'),
+
     // Context Menu Command (Right-Click App)
     { name: 'whatisthis', type: 3 }
 ].map(command => command.toJSON ? command.toJSON() : command);
@@ -70,7 +73,7 @@ const rest = new REST({ version: '10' }).setToken(config.discordToken);
             { body: commands },
         );
 
-        console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+        console.log(`Successfully reloaded ${data.length} global application (/) commands.`);
     } catch (error) {
         console.error(error);
     }
