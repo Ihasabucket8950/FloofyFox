@@ -166,7 +166,7 @@ const Database = {
     addCustomCommand(guildId, name, response) { this._ensureGuildSettings(guildId); settings[guildId].customCommands[name.toLowerCase()] = response; },
     removeCustomCommand(guildId, name) { this._ensureGuildSettings(guildId); if(settings[guildId].customCommands[name.toLowerCase()]) { delete settings[guildId].customCommands[name.toLowerCase()]; return true; } return false; },
     listCustomCommands(guildId) { this._ensureGuildSettings(guildId); return settings[guildId].customCommands; },
-    
+
     getMusicChannelId(guildId) { this._ensureGuildSettings(guildId); return settings[guildId].musicChannelId; },
     setMusicChannelId(guildId, channelId) { this._ensureGuildSettings(guildId); settings[guildId].musicChannelId = channelId; },
     

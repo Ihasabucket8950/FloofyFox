@@ -42,6 +42,18 @@ const commands = [
         .addStringOption(opt => opt.setName('message').setDescription('The message to send').setRequired(true)),
     new SlashCommandBuilder().setName('purge').setDescription('Admin: Deletes a specified number of recent messages.')
         .addIntegerOption(opt => opt.setName('amount').setDescription('The number of messages to delete (1-100)').setRequired(true).setMinValue(1).setMaxValue(100)),
+    // --- ADDED NEW COMMAND ---
+    new SlashCommandBuilder().setName('mymemory').setDescription('Manage the facts Floofy has learned about you.')
+        .addSubcommand(sub => sub
+            .setName('view')
+            .setDescription('View the facts and traits Floofy has learned about you.'))
+        .addSubcommand(sub => sub
+            .setName('forget')
+            .setDescription('Tell Floofy to forget a specific fact about you.')
+            .addIntegerOption(option => option
+                .setName('number')
+                .setDescription('The number of the fact to forget, from the view list.')
+                .setRequired(true))),
     // Context Menu Command (Right-Click App)
     { name: 'whatisthis', type: 3 }
 ].map(command => command.toJSON ? command.toJSON() : command);
@@ -58,7 +70,7 @@ const rest = new REST({ version: '10' }).setToken(config.discordToken);
             { body: commands },
         );
 
-        console.log(`Successfully reloaded ${data.length} global application (/) commands.`);
+        console.log(`Successfully reloaded ${data.length} application (/) commands.`);
     } catch (error) {
         console.error(error);
     }

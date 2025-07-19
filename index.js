@@ -432,6 +432,41 @@ client.on('interactionCreate', async interaction => {
             .setTimestamp();
         await interaction.reply({ embeds: [leaderboardEmbed] });
     }
+	else if (commandName === 'mymemory') {
+        const subCommand = options.getSubcommand();
+        const user = interaction.user;
+        const profile = db.getProfile(user.id);
+
+        if (!profile || !profile.notes || profile.notes.length === 0) {
+            return interaction.reply({ content: "I don't have any learned facts or notes for you yet!", flags: [MessageFlags.Ephemeral] });
+        }
+
+        if (subCommand === 'view') {
+            let memoryList = "**Here's what I have in my notes about you, rawr!**\n\n";
+            profile.notes.forEach((note, index) => {
+                memoryList += `**${index + 1}.** ${note}\n`;
+            });
+            memoryList += "\nTo forget a fact, use `/mymemory forget [number]`.";
+            
+            try {
+                await user.send(memoryList);
+                await interaction.reply({ content: "I've sent a list of my notes about you to your DMs!", flags: [MessageFlags.Ephemeral] });
+            } catch (e) {
+                await interaction.reply({ content: "I couldn't send you a DM. Please check your privacy settings.", flags: [MessageFlags.Ephemeral] });
+            }
+        } 
+        else if (subCommand === 'forget') {
+            const number = options.getInteger('number');
+            const index = number - 1; // Adjust for zero-based array index
+
+            if (db.deleteNoteByIndex(user.id, index)) {
+                await db.save();
+                await interaction.reply({ content: `Okay! I've forgotten fact number ${number}.`, flags: [MessageFlags.Ephemeral] });
+            } else {
+                await interaction.reply({ content: `I couldn't find a fact with that number. Please use \`/mymemory view\` first.`, flags: [MessageFlags.Ephemeral] });
+            }
+        }
+    }
     else if (commandName === 'privacy') {
         if (!config.privacyPolicyUrl) return interaction.reply({ content: "The bot owner has not set a privacy policy URL yet.", ephemeral: true });
         await interaction.reply(`You can view my privacy policy here: ${config.privacyPolicyUrl}`);
