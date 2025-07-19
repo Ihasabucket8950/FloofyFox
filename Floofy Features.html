@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-M-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floofy Fox Bot: An Infographic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        .flow-arrow {
+            font-size: 2rem;
+            color: #FF7B00;
+            line-height: 1;
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #FF7B00, #FFD200);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white antialiased">
+
+    <!-- PALETTE: Energetic & Playful -->
+    <!-- NARRATIVE PLAN: 1. Intro, 2. AI Core, 3. Commands, 4. Engagement, 5. Music, 6. Passive Features. -->
+    <!-- VISUALIZATION PLAN: Big Number, HTML Flowchart, Chart.js Bar Charts, Chart.js Line Chart, HTML Icon List, HTML Card Grid. -->
+    <!-- CONFIRMATION: No SVG or Mermaid.js used. All diagrams are HTML/CSS or Chart.js Canvas. -->
+
+    <div class="container mx-auto p-4 md:p-8">
+        
+        <header class="text-center my-12">
+            <h1 class="text-4xl md:text-6xl font-black gradient-text">Meet Floofy Fox</h1>
+            <p class="text-lg md:text-xl text-gray-300 mt-4 max-w-3xl mx-auto">An advanced, multi-server AI companion designed to bring intelligence, engagement, and powerful tools to your community.</p>
+        </header>
+
+        <main class="space-y-16">
+
+            <section class="bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8 text-center">
+                 <h2 class="text-2xl font-bold text-orange-400 mb-2">A Feature-Packed Companion</h2>
+                 <p class="text-gray-400 mb-6">Floofy is more than just a chatbot, offering a complete suite of integrated features.</p>
+                <div class="text-8xl md:text-9xl font-black text-white">30+</div>
+                <p class="text-2xl font-bold mt-2">Unique Features & Commands</p>
+            </section>
+
+            <section id="ai-core" class="bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-center mb-2">The Brain of the Bot</h2>
+                <p class="text-gray-400 text-center mb-10 max-w-2xl mx-auto">Floofy's intelligence comes from a sophisticated, multi-step process for every message, enabling persistent memory and personalized interactions.</p>
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 text-center">
+                    <div class="bg-gray-700 p-4 rounded-lg shadow-lg">
+                        <p class="font-bold text-lg">User Message</p>
+                        <p class="text-sm text-gray-400">A new message is sent.</p>
+                    </div>
+                    <div class="flow-arrow">&#8594;</div>
+                    <div class="bg-gray-700 p-4 rounded-lg shadow-lg">
+                        <p class="font-bold text-lg">Memory & Profile Check</p>
+                        <p class="text-sm text-gray-400">Retrieves past chats & user facts.</p>
+                    </div>
+                    <div class="flow-arrow">&#8594;</div>
+                    <div class="bg-pink-500 p-4 rounded-lg shadow-lg">
+                        <p class="font-bold text-lg">Gemini AI</p>
+                        <p class="text-sm text-pink-100">Context is sent to the AI.</p>
+                    </div>
+                    <div class="flow-arrow">&#8594;</div>
+                    <div class="bg-blue-500 p-4 rounded-lg shadow-lg">
+                        <p class="font-bold text-lg">Floofy's Response</p>
+                        <p class="text-sm text-blue-100">A creative, contextual reply.</p>
+                    </div>
+                     <div class="flow-arrow">&#8635;</div>
+                     <div class="bg-gray-700 p-4 rounded-lg shadow-lg">
+                        <p class="font-bold text-lg">Memory Updated</p>
+                        <p class="text-sm text-gray-400">New facts & chats are saved.</p>
+                    </div>
+                </div>
+                 <p class="text-center text-gray-500 mt-8 italic">This entire loop happens in seconds, creating a seamless conversational experience.</p>
+            </section>
+
+            <section id="commands" class="bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-center mb-2">The Command Center</h2>
+                <p class="text-gray-400 text-center mb-10 max-w-2xl mx-auto">Floofy offers a wide array of slash commands, neatly divided into tools for general users and powerful utilities for server administrators.</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold text-center text-cyan-400 mb-4">User Commands (12 Total)</h3>
+                        <p class="text-center text-gray-500 mb-4">Tools available to all server members to enhance their experience.</p>
+                        <div class="chart-container">
+                            <canvas id="userCommandsChart"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-center text-pink-400 mb-4">Admin Commands (11 Total)</h3>
+                        <p class="text-center text-gray-500 mb-4">Powerful utilities for server management and bot configuration.</p>
+                        <div class="chart-container">
+                            <canvas id="adminCommandsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="engagement" class="bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-center mb-2">The Engagement Engine</h2>
+                <p class="text-gray-400 text-center mb-10 max-w-2xl mx-auto">An integrated leveling system rewards users for participating in the community, creating a fun progression loop.</p>
+                <div class="text-center">
+                     <h3 class="text-xl font-semibold text-center text-yellow-400 mb-4">XP Progression Curve</h3>
+                     <p class="text-center text-gray-500 mb-4">The amount of XP required to level up increases with each level, providing a challenging and rewarding journey.</p>
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="xpChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="music" class="bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-center mb-2">The Ultimate Music Maestro</h2>
+                <p class="text-gray-400 text-center mb-10 max-w-2xl mx-auto">Floofy transforms any server into a listening party with a professional-grade music system.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                    <div class="bg-gray-700 p-6 rounded-lg">
+                        <div class="text-4xl mb-2">&#127925;</div>
+                        <h4 class="font-bold text-lg">YouTube & Spotify</h4>
+                        <p class="text-gray-400 text-sm">Plays songs and playlists from major platforms.</p>
+                    </div>
+                    <div class="bg-gray-700 p-6 rounded-lg">
+                        <div class="text-4xl mb-2">&#128190;</div>
+                        <h4 class="font-bold text-lg">Persistent UI</h4>
+                        <p class="text-gray-400 text-sm">An "always-on" control panel with buttons for easy music management.</p>
+                    </div>
+                    <div class="bg-gray-700 p-6 rounded-lg">
+                        <div class="text-4xl mb-2">&#128279;</div>
+                        <h4 class="font-bold text-lg">Smart Link Handling</h4>
+                        <p class="text-gray-400 text-sm">Just paste a link to add to the queue; no command needed.</p>
+                    </div>
+                    <div class="bg-gray-700 p-6 rounded-lg">
+                        <div class="text-4xl mb-2">&#128683;</div>
+                        <h4 class="font-bold text-lg">Auto Voice Management</h4>
+                        <p class="text-gray-400 text-sm">Joins when needed and leaves empty channels automatically.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="passive" class="bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-center mb-2">Passive & Special Abilities</h2>
+                <p class="text-gray-400 text-center mb-10 max-w-2xl mx-auto">Floofy works in the background with special features that activate automatically or through unique interactions.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-gray-700 p-6 rounded-lg">
+                        <h4 class="font-bold text-lg mb-2">👋 Welcome Messages</h4>
+                        <p class="text-gray-400 text-sm">Automatically posts a custom message when a new member joins the server.</p>
+                    </div>
+                    <div class="bg-gray-700 p-6 rounded-lg">
+                        <h4 class="font-bold text-lg mb-2">📌 Message Logging</h4>
+                        <p class="text-gray-400 text-sm">Reacting to any message with a pin emoji saves it to a designated log channel.</p>
+                    </div>
+                    <div class="bg-gray-700 p-6 rounded-lg">
+                        <h4 class="font-bold text-lg mb-2">🖼️ Image Recognition</h4>
+                        <p class="text-gray-400 text-sm">Right-click an image and select "whatisthis" to get an AI-powered description.</p>
+                    </div>
+                    <div class="bg-gray-700 p-6 rounded-lg">
+                        <h4 class="font-bold text-lg mb-2">🦊 AI Status Updater</h4>
+                        <p class="text-gray-400 text-sm">Floofy's "Playing" status is uniquely generated by AI every 30 minutes for a quirky touch.</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+        
+        <footer class="text-center mt-16 py-8 border-t border-gray-700">
+            <p class="text-gray-500">Add Floofy To Your Server Today!</p>
+        </footer>
+
+    </div>
+
+    <script>
+        function processLabel(label) {
+            const maxLength = 16;
+            if (label.length <= maxLength) {
+                return label;
+            }
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = '';
+            for (const word of words) {
+                if ((currentLine + ' ' + word).trim().length > maxLength) {
+                    lines.push(currentLine.trim());
+                    currentLine = word;
+                } else {
+                    currentLine = (currentLine + ' ' + word).trim();
+                }
+            }
+            if (currentLine) {
+                lines.push(currentLine.trim());
+            }
+            return lines;
+        }
+
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+                return label.join(' ');
+            }
+            return label;
+        };
+        
+        const userCommandsData = {
+            labels: ['/help', '/ping', '/mynameis', '/forgetme', '/mymemory', '/level', '/leaderboard', '/summarize', '/timein', '/privacy', '/tos'].map(processLabel),
+            datasets: [{
+                label: 'User Commands',
+                data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                backgroundColor: '#00A4CC',
+                borderColor: '#00A4CC',
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        };
+
+        const adminCommandsData = {
+            labels: ['/chatchannel', '/listenchannel', '/clearhistory', '/viewprofile', '/addnote', '/leveladmin', '/setwelcomechannel', '/setlogchannel', '/setwelcome', '/announce', '/purge'].map(processLabel),
+            datasets: [{
+                label: 'Admin Commands',
+                data: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                backgroundColor: '#F938F3',
+                borderColor: '#F938F3',
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        };
+        
+        const chartOptions = {
+            indexAxis: 'y',
+            maintainAspectRatio: false,
+            scales: {
+                x: { display: false, beginAtZero: true, grid: { display: false } },
+                y: { grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#D1D5DB' } }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: tooltipTitleCallback
+                    }
+                }
+            }
+        };
+
+        new Chart(document.getElementById('userCommandsChart'), { type: 'bar', data: userCommandsData, options: chartOptions });
+        new Chart(document.getElementById('adminCommandsChart'), { type: 'bar', data: adminCommandsData, options: chartOptions });
+        
+        const xpForLevel = level => 5 * (level ** 2) + 50 * level + 100;
+        const levels = Array.from({ length: 20 }, (_, i) => i + 1);
+        const xpData = levels.map(xpForLevel);
+        
+        new Chart(document.getElementById('xpChart'), {
+            type: 'line',
+            data: {
+                labels: levels.map(l => `Level ${l}`),
+                datasets: [{
+                    label: 'XP Required for Next Level',
+                    data: xpData,
+                    fill: true,
+                    backgroundColor: 'rgba(255, 123, 0, 0.2)',
+                    borderColor: '#FF7B00',
+                    tension: 0.3
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#D1D5DB' }
+                    },
+                    x: {
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#D1D5DB' }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#D1D5DB'
+                        }
+                    }
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
